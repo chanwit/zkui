@@ -30,7 +30,15 @@ abstract class ZKAbstractTagLib {
         def composeHandle = new ComposerHandler(attrs.remove("apply"))
         Component component = componentClass.newInstance()
         composeHandle.doBeforeComposeChildren(component)
-        if (pageScope.getVariable("parents")==null) {
+
+        // fix from ZKUI's issue #9
+        boolean existParents = false
+        try {
+            if (pageScope.getVariable('parents')) {
+                existParents = true
+            }
+        } catch (e) {}
+        if (!existParents) {
             pageScope.parents = new LinkedList<Component>()
             pageScope.parents.push(component)
             doRender(servletContext, request, response, body, pageScope, out, composeHandle, component, attrs)
